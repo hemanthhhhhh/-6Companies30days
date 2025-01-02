@@ -1,0 +1,25 @@
+class Solution {
+    public int numberOfSubarrays(int[] nums, int k) {
+        
+        int n = nums.length;
+        int lessThan = lessThan(nums, k, n);
+        int lessThanK = lessThan(nums, k - 1, n);
+        return lessThan - lessThanK;
+    }
+    public int lessThan(int nums[], int k, int n) {
+
+        int i = 0, j = 0;
+        int cnt = 0, sum = 0;
+
+        while(j < n) {
+            sum += (nums[j] % 2);
+            while(sum > k) {
+                sum -= (nums[i] % 2);
+                i++;
+            }
+            cnt += j - i + 1;
+            j++; 
+        }
+        return cnt;
+    }
+}
