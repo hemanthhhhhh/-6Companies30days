@@ -1,0 +1,79 @@
+class Solution {
+    class Pair {
+        int first;
+        int second;
+        public Pair(int _first, int _second) {
+            this.first = _first;
+            this.second = _second;
+        }
+    }
+    public int findTheCity(int n, int[][] edges, int distanceThreshold) {
+        
+        ArrayList<ArrayList<Pair>> adj = new ArrayList<>();
+        int m = edges.length;
+
+        for(int i = 0;i < n;i++) {
+            adj.add(new ArrayList<>());
+        }
+
+        for(int i = 0;i < m;i++) {
+            int u = edges[i][0];
+            int v = edges[i][1];
+            int wt = edges[i][2];
+
+            adj.get(u).add(new Pair(v, wt));
+            adj.get(v).add(new Pair(u, wt));
+        }
+        int mat[][] = new int[n][n];
+        for(int i = 0;i < n;i++) {
+            Arrays.fill(mat[i], Integer.MAX_VALUE);
+            mat[i][i] =  0;
+        }
+        for(int i = 0;i < n;i++) {
+            dijkstra(mat[i], n, adj, i);
+        }
+        return minCities(n, mat, distanceThreshold);
+    }
+    public void dijkstra(int res[], int n, ArrayList<ArrayList<Pair>> adj, int start) {
+
+        PriorityQueue<Pair> pq = new PriorityQueue<>((a, b) -> a.second - b.second);
+        pq.add(new Pair(start, 0));
+        Arrays.fill(res, Integer.MAX_VALUE);
+        res[start] = 0;
+
+        
+         while (!pq.isEmpty()) {
+            Pair current = pq.poll();
+            int node = current.first;
+            int distance = current.second;
+
+            for (Pair neighbor : adj.get(node)) {
+                int adjNode = neighbor.first;
+                int edgeWeight = neighbor.second;
+
+                if (distance + edgeWeight < res[adjNode]) {
+                    res[adjNode] = distance + edgeWeight;
+                    pq.add(new Pair(adjNode, res[adjNode]));
+                }
+            }
+        }
+    }
+    public int minCities(int n, int mat[][], int dis) {
+
+        int ind = -1, fewCities = Integer.MAX_VALUE;
+
+        for(int i = 0;i < n;i++) {
+            int cnt = 0;
+            for(int j = 0;j < n;j++) {
+                if(i != j && mat[i][j] <= dis) {
+                    cnt++;
+                }
+            }
+            if(cnt <= fewCities) {
+                fewCities = cnt;
+                ind = i;
+            }
+        }
+        return ind;
+    }
+}
